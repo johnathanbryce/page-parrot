@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PageParrot</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../styles/reset.css">       
+        <link rel="stylesheet" href="../styles/vars.css">        
+        <link rel="stylesheet" href="../styles/globals.css">
+        <link rel="stylesheet" href="popup.css">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header class="header">
+            <img 
+                src="../images/page-parrot-transparent.png" 
+                alt="Page Parrot's official icon. A 2d logo of a teal, orange and white parrot."
+                class="header-logo"
+                />
+            <h1 class="header-text"> Page Parrot </h1>
+        </header>
+
+        <main>
+            <p>Set a reminder for when you revisit this page next:</p>
+    
+            <ul class="reminders-list">
+    
+            </ul>
+            <form id="reminder-form" class="reminder-form">
+                <p class="warning-text"> *Do not input any confidential data* </p>
+                <textarea 
+                    id="reminder-text" 
+                    class="reminder-input-text"
+                    placeholder="Type your reminder here..." 
+                    required></textarea>
+                <button type="submit" class="btn-submit-reminder">Save Reminder</button>
+            </form>
+        </main>
+        <script src="popup.js"></script> 
+    </body>
+</html>

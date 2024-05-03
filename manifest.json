@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "PageParrot",
+    "version": "1.0",
+    "description": "Leave reminder's to yourself when you re-visit a web page.",
+    "permissions": [
+      "activeTab",
+      "storage",
+      "tabs",
+      "notifications",
+      "webNavigation"
+    ],
+    "action": {
+      "default_icon": "src/images/page-parrot.png", 
+      "default_popup": "src/popup/popup.html"
+    },
+    "background": {
+      "service_worker": "src/background/background.js"
+    },
+    "icons": {
+      "16": "src/images/page-parrot.png", 
+      "32": "src/images/page-parrot.png",
+      "48": "src/images/page-parrot.png",
+      "128": "src/images/page-parrot.png"
+    }
+}
+  
