@@ -3,9 +3,9 @@
     /* Color scheme */
     --primary-color: #34A7A2; /* A slightly deeper teal reminiscent of tropical waters */
     --secondary-color: #80D1F4; /* A soft sky blue for a clean, calming effect */
-    --accent-color: #FF9472; /* A warm coral to complement the cooler primary tones */
+    --accent-color: #FFA500; /* A warm coral to complement the cooler primary tones */
     --background-color: #E5F4F9; /* A very light blue, almost white, for background areas */
-    --warning-color: #FFA500;
+    --warning-color:  #FF9472;
     --btn-color: #58BFBF ; /* A medium teal for buttons, providing more contrast with the primary color */
 
     /* Typography color schemes */

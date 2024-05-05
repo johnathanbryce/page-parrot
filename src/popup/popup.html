@@ -31,15 +31,21 @@
     
             </ul>
             <form id="reminder-form" class="reminder-form">
-                <p class="warning-text"> *Do not input any confidential data* </p>
-                <textarea 
-                    id="reminder-text" 
+                <input 
+                    type="text" 
+                    id="reminder-text"
                     class="reminder-input-text"
                     placeholder="Type your reminder here..." 
-                    required></textarea>
+                    required
+                >
+                <label for="reminder-text" class="label-warning">Do not input any confidential information!</label>
                 <button type="submit" class="btn-submit-reminder">Save Reminder</button>
             </form>
+            
         </main>
+
+
+        
         <script src="popup.js"></script> 
     </body>
 </html>
