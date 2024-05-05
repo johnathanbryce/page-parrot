@@ -14,6 +14,6 @@ function checkActiveTab() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const url = tabs[0].url;
         // console.log('Active or updated URL:', url);
-        // Potentially notify the user with a browser notification if there are reminders
+        // TODO: notify the user with a browser notification if there are reminders
     });
 }

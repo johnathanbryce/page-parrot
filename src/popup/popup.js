@@ -1,4 +1,5 @@
-/* This script is  responsible for:
+/* 
+This script is  responsible for:
    - Fetching and displaying existing reminders when the popup is opened
    - Adding/deleting reminders to the current active URL and updating the display immediately
 */
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-    var input = document.getElementById('reminder-text');
+    const input = document.getElementById('reminder-text');
     input.addEventListener("focus", function() {
         this.nextElementSibling.style.visibility = 'visible';  // Show warning label on focus
     });
@@ -67,23 +68,28 @@ function displayReminders(url) {
         // display this list of reminders
         reminders.forEach(reminder => {
             const reminderElement = document.createElement("li");
+            // set the id of the reminder as its text value
+            reminderElement.dataset.id = reminder; 
+
             // create text node for the reminder text to avoid overriding the innerHTML
             const reminderText = document.createTextNode(reminder);
             reminderElement.appendChild(reminderText);
-
+           
             // container for icons
             const iconContainer = document.createElement('div');
             iconContainer.className = 'icon-container';
 
             // edit an existing reminder
             const editIcon = document.createElement('img');
-            editIcon.src = '../images//edit-icon.svg'; 
+            editIcon.src = '../images/edit-icon.svg'; 
+            editIcon.alt='Edit reminder'
             editIcon.className = 'icon';
             editIcon.onclick = () => editReminder(url, reminder);
             iconContainer.appendChild(editIcon);
             // add delete icon to reminder
             const deleteIcon = document.createElement('img');
-            deleteIcon.src = '../images//delete-icon.svg'; 
+            deleteIcon.src = '../images/delete-icon.svg'; 
+            deleteIcon.alt= 'Delete reminder'
             deleteIcon.className = 'icon';
             deleteIcon.onclick = () => deleteReminder(url, reminder);
             iconContainer.appendChild(deleteIcon);
@@ -99,6 +105,8 @@ function displayReminders(url) {
 
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
 function addReminder(url, reminder) {
+    // TODO: check if the reminder already exists on the list and do not allow
+    // user to add it if it already exists
     chrome.storage.sync.get(url, function(result) {
         let reminders = result[url] || [];
         reminders.push(reminder);
@@ -124,9 +132,30 @@ function deleteReminder(url, reminderToDelete) {
     });
 }
 
-function editReminder(url, reminderToEdit) {
-    console.log(url, reminderToEdit)
+// receives url & reminder from displayReminders() on creation of new reminder
+function saveReminder(url, reminderElementKey) {
+    // select the element to make it uneditable again
+    const reminderEle = document.querySelector(`li[data-id="${reminderElementKey}"]`);
+    reminderEle.contentEditable = 'false'
+    // re-enabled "Save Reminder" btn
+    // TODO: add that functionality here
+
+    // TODO: save the updated element associated with the url in chrome storage
+    chrome.storage.sync.get(url, function(result) {
+       
+    });
 }
+
+// receives url & reminder from displayReminders() on creation of new reminder
+function editReminder(url, reminderToEdit) {
+    // TODO: replace edit icon with save icon 
+    // TODO: disable "Save Reminder" button until saveReminder is clicked
+    const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
+    reminderEle.contentEditable = 'true'
+    saveReminder(url, reminderToEdit)
+   
+}
+
 
 
 
