@@ -1,3 +1,9 @@
+main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-gap);
+}
+
 .header{
     display: flex;
     flex-direction: row;
@@ -5,6 +11,7 @@
     padding: 0;
     gap: var(--content-gap);
 }
+
 .header-logo {
     width: 8rem;
     object-fit: cover;
@@ -15,6 +22,7 @@
 }
 
 .warning-text {
+    display: none; /* triggered visible on user focus of textarea input */
     color: var(--warning-color);
     font-size: clamp(1.2rem, 2vw, 1.4rem);
 }
@@ -34,6 +42,11 @@
     font-weight: 800;
 }
 
+.icon-container {
+    display: flex;
+    gap: var(--content-gap);
+}
+
 .icon {
     width: 1.6rem;
     height: 1.6rem;
@@ -42,24 +55,51 @@
 }
 
 .icon:hover{
-    width: 1.8rem;
-    height: 1.8rem;
+   
 }
 
 .reminder-form {
     display: flex;
     flex-direction: column;
     gap: var(--content-gap);
+    position: relative;
 }
 
-.reminder-input-text{
+.reminder-input-text {
     width: 100%;
-    height: 4.5rem;
+    /* height: 6rem; */
     resize: none;
     padding: 1rem;
+    padding-top: 2rem;  
     outline: none;
+    border: none;  
+    background-color: white;
     border-radius: var(--border-radius);
 }
+
+.reminder-input-text:focus {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 0.1rem solid var(--accent-color);
+    outline: none;
+}
+
+.label-warning {
+    position: absolute;
+    top: 0; 
+    left: 1rem; 
+    font-size: 1rem;
+    visibility: hidden;  /* Hide by default */
+    transition: visibility 0.1s, color 0.3s;
+}
+
+.reminder-input-text:focus + .label-warning {
+    visibility: visible;
+    color: var(--warning-color);  /* Color when input is focused */
+}
+
+
 
 .btn-submit-reminder{
     width: 100%;
@@ -80,3 +120,6 @@
     border: 0.1rem solid var(--background-color);
     background-color: var(--hover-color);
 }
+
+
+
