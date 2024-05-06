@@ -18,10 +18,10 @@
       "service_worker": "src/background/background.js"
     },
     "icons": {
-      "16": "src/images/page-parrot.png", 
-      "32": "src/images/page-parrot.png",
-      "48": "src/images/page-parrot.png",
-      "128": "src/images/page-parrot.png"
+      "16": "src/images/page-parrot-icon-16.svg", 
+      "32": "src/images/page-parrot-icon-32.png",
+      "48": "src/images/page-parrot-icon-48.png",
+      "128": "src/images/page-parrot-icon-128.png"
     }
 }
   

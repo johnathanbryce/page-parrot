@@ -1,4 +1,5 @@
-/* This script is  responsible for:
+/* 
+This script is  responsible for:
    - Fetching and displaying existing reminders when the popup is opened
    - Adding/deleting reminders to the current active URL and updating the display immediately
 */
@@ -7,6 +8,8 @@
 // TODO:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
     -- edit existing reminders
+    -- add a time stamp for when these were last left
+    -- clicking outside extension (i.e. document) closes it
 */
 
 // ensures dom loaded before fetching url and displaying reminders 
@@ -15,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-    var input = document.getElementById('reminder-text');
+    const input = document.getElementById('reminder-text');
     input.addEventListener("focus", function() {
         this.nextElementSibling.style.visibility = 'visible';  // Show warning label on focus
     });
@@ -63,33 +66,38 @@ function displayReminders(url) {
     chrome.storage.sync.get(url, function(result) {
         const reminders = result[url] || [];
         const remindersListContainer = document.querySelector(".reminders-list");
-        remindersListContainer.innerHTML = ''; // Clear previous reminders
-        // display this list of reminders
+        remindersListContainer.innerHTML = ''; // clear previous reminders
+        // display the reminder(s) 
         reminders.forEach(reminder => {
             const reminderElement = document.createElement("li");
+            // set the id of the reminder as its text value
+            reminderElement.dataset.id = reminder; 
+
             // create text node for the reminder text to avoid overriding the innerHTML
             const reminderText = document.createTextNode(reminder);
             reminderElement.appendChild(reminderText);
-
+           
             // container for icons
-            const iconContainer = document.createElement('div');
-            iconContainer.className = 'icon-container';
+/*             const iconContainer = document.createElement('div');
+            iconContainer.className = 'icon-container'; */
 
             // edit an existing reminder
             const editIcon = document.createElement('img');
-            editIcon.src = '../images//edit-icon.svg'; 
-            editIcon.className = 'icon';
+            editIcon.src = '../images/edit-icon.svg'; 
+            editIcon.alt='Edit reminder'
+            editIcon.className = 'icon-edit';
             editIcon.onclick = () => editReminder(url, reminder);
-            iconContainer.appendChild(editIcon);
+            reminderElement.appendChild(editIcon);
             // add delete icon to reminder
             const deleteIcon = document.createElement('img');
-            deleteIcon.src = '../images//delete-icon.svg'; 
-            deleteIcon.className = 'icon';
+            deleteIcon.src = '../images/delete-icon.svg'; 
+            deleteIcon.alt= 'Delete reminder'
+            deleteIcon.className = 'icon-delete';
             deleteIcon.onclick = () => deleteReminder(url, reminder);
-            iconContainer.appendChild(deleteIcon);
+            reminderElement.appendChild(deleteIcon);
 
             // append the icon container to the li
-            reminderElement.appendChild(iconContainer);
+            /* reminderElement.appendChild(iconContainer); */
 
             // Append the reminder li to the ul
             remindersListContainer.appendChild(reminderElement);
@@ -99,6 +107,8 @@ function displayReminders(url) {
 
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
 function addReminder(url, reminder) {
+    // TODO: check if the reminder already exists on the list and do not allow
+    // the user to add it if it already exists
     chrome.storage.sync.get(url, function(result) {
         let reminders = result[url] || [];
         reminders.push(reminder);
@@ -125,8 +135,61 @@ function deleteReminder(url, reminderToDelete) {
 }
 
 function editReminder(url, reminderToEdit) {
-    console.log(url, reminderToEdit)
+    // get the reminder ele and make it edittable
+    const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
+    reminderEle.contentEditable = 'true';
+
+    // hide delete icon and disable "Save Reminder" button
+    const deleteIcon = reminderEle.querySelector('.icon-delete');
+    deleteIcon.style.visibility = 'hidden';
+
+    const submitBtn = document.querySelector('.btn-submit-reminder');
+    submitBtn.disabled = true;
+    submitBtn.classList.add("btn-submit-reminder-disabled");
+
+    // replace edit icon with save icon
+    const editIcon = reminderEle.querySelector('.icon-edit');
+    editIcon.src = '../images/save-icon.svg';
+    editIcon.alt = 'Save reminder';
+    editIcon.onclick = () => saveReminder(url, reminderToEdit);
 }
+
+function saveReminder(url, reminderToEdit) {
+    // get the reminder ele and make it unedittable
+    const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
+    reminderEle.contentEditable = 'false';
+
+    // show delete icon and enable "Save Reminder" button
+    const deleteIcon = reminderEle.querySelector('.icon-delete');
+    deleteIcon.style.visibility = 'visible';
+
+    const submitBtn = document.querySelector('.btn-submit-reminder');
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("btn-submit-reminder-disabled");
+
+    // replace save icon with edit icon
+    const saveIcon = reminderEle.querySelector('.icon-edit');
+    saveIcon.src = '../images/edit-icon.svg';
+    saveIcon.alt = 'Edit reminder';
+    saveIcon.onclick = () => editReminder(url, reminderToEdit);
+
+    // Save the updated reminder text
+    const updatedText = reminderEle.textContent;
+    updateReminderInStorage(url, reminderToEdit, updatedText);
+}
+
+function updateReminderInStorage(url, oldReminder, newReminder) {
+    chrome.storage.sync.get(url, function(result) {
+        let reminders = result[url];
+        let reminderIndex = reminders.indexOf(oldReminder);
+        reminders[reminderIndex] = newReminder; // update with new reminder text
+        chrome.storage.sync.set({ [url]: reminders }, function() {
+            displayReminders(url); // refresh the list of reminders
+        });
+    });
+}
+
+
 
 
 
