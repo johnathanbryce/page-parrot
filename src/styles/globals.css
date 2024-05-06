@@ -37,7 +37,10 @@ input {
 li {
     list-style-type: none;
     font-size: clamp(1.6rem, 2vw, 2rem);
-    color: var(--accent-color);
+    color: var(--font-color);
+    background-color: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
 }
 
 h1 {

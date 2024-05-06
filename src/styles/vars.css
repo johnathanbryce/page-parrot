@@ -1,18 +1,19 @@
 /* vars.css */
 :root {
     /* Color scheme */
-    --primary-color: #34A7A2; /* A slightly deeper teal reminiscent of tropical waters */
-    --secondary-color: #80D1F4; /* A soft sky blue for a clean, calming effect */
-    --accent-color: #FFA500; /* A warm coral to complement the cooler primary tones */
-    --background-color: #E5F4F9; /* A very light blue, almost white, for background areas */
-    --warning-color:  #FF9472;
-    --btn-color: #58BFBF ; /* A medium teal for buttons, providing more contrast with the primary color */
+    --primary-color: #5C80BC; 
+    /* --secondary-color: #80D1F4; */ 
+    --accent-color: #379634; 
+    --background-color: #E8F0FE;
+    --disabled-color: #ECEFF1;
+    --warning-color:  #AD343E;
+    --btn-color: #5C80BC ; 
 
     /* Typography color schemes */
-    --font-color: #333333; /* A dark gray for readability instead of stark white */
+    --font-color: #0F1A20; 
 
     /* Actions */
-    --hover-color: #FCE2C4; /* A light, warm peach for hover effects, giving a soft and inviting feel */
+    --hover-color: #379634; 
     --hover-transition: 0.5s ease-in-out;
 
     /* Borders */
