@@ -9,7 +9,6 @@ This script is  responsible for:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
     -- edit existing reminders
     -- add a time stamp for when these were last left
-    -- clicking outside extension (i.e. document) closes it
 */
 
 // ensures dom loaded before fetching url and displaying reminders 
@@ -20,19 +19,18 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener("DOMContentLoaded", function() {
     const input = document.getElementById('reminder-text');
     input.addEventListener("focus", function() {
-        this.nextElementSibling.style.visibility = 'visible';  // Show warning label on focus
+        this.nextElementSibling.style.visibility = 'visible';  // show warning label on focus
     });
 
     input.addEventListener("blur", function() {
         if (this.value === "") {
-            this.nextElementSibling.style.visibility = 'hidden';  // Hide warning label if input is empty
+            this.nextElementSibling.style.visibility = 'hidden';  // hide warning label if input is empty
         }
     });
 });
 
 
 const submitForm = document.getElementById('reminder-form');
-// TODO: allow for enter keyboard press to submits
 submitForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const textInput = document.getElementById('reminder-text');
@@ -45,13 +43,11 @@ submitForm.addEventListener('submit', (e) => {
 });
 
 // access the users active url 
-// TODO: only get the first bit of the url anything after "/"" just ignore 
-// page parrot should trigger notifs on every page of the website not at the exact url
 async function getCurrentUrl() {
     try {
         let [tab] = await chrome.tabs.query({active: true, currentWindow: true});
         let url = tab.url
-        // create a URL object
+        // create a URL object -- this will help target the hostname: www.google.ca instead of www.google.ca/xyz
         const parsedUrl = new URL(url);
         // combine the protocol and hostname to get the base URL
         const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
@@ -70,16 +66,13 @@ function displayReminders(url) {
         // display the reminder(s) 
         reminders.forEach(reminder => {
             const reminderElement = document.createElement("li");
+            reminderElement.className = "reminder-item"
             // set the id of the reminder as its text value
             reminderElement.dataset.id = reminder; 
 
             // create text node for the reminder text to avoid overriding the innerHTML
             const reminderText = document.createTextNode(reminder);
             reminderElement.appendChild(reminderText);
-           
-            // container for icons
-/*             const iconContainer = document.createElement('div');
-            iconContainer.className = 'icon-container'; */
 
             // edit an existing reminder
             const editIcon = document.createElement('img');
@@ -96,10 +89,6 @@ function displayReminders(url) {
             deleteIcon.onclick = () => deleteReminder(url, reminder);
             reminderElement.appendChild(deleteIcon);
 
-            // append the icon container to the li
-            /* reminderElement.appendChild(iconContainer); */
-
-            // Append the reminder li to the ul
             remindersListContainer.appendChild(reminderElement);
         });
     });
@@ -121,6 +110,7 @@ function addReminder(url, reminder) {
 
 // delete a reminder
 function deleteReminder(url, reminderToDelete) {
+    exitEditMode()
     // get the reminders to remove the targetted reminder
     chrome.storage.sync.get(url, function(result) {
         // get all reminders for the url as an array
@@ -134,18 +124,17 @@ function deleteReminder(url, reminderToDelete) {
     });
 }
 
+// TODO:
+// need to disable all other reminders and set the focus on the editted reminder
+// i.e need to focus the remidner being editted and the other inputs CANNOT
+// be deleted or editted or functionality gets messed up
 function editReminder(url, reminderToEdit) {
     // get the reminder ele and make it edittable
     const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
     reminderEle.contentEditable = 'true';
+    reminderEle.classList.add('editing') // this identifies the reminder currently being editted
 
-    // hide delete icon and disable "Save Reminder" button
-    const deleteIcon = reminderEle.querySelector('.icon-delete');
-    deleteIcon.style.visibility = 'hidden';
-
-    const submitBtn = document.querySelector('.btn-submit-reminder');
-    submitBtn.disabled = true;
-    submitBtn.classList.add("btn-submit-reminder-disabled");
+    enterEditMode();
 
     // replace edit icon with save icon
     const editIcon = reminderEle.querySelector('.icon-edit');
@@ -176,6 +165,9 @@ function saveReminder(url, reminderToEdit) {
     // Save the updated reminder text
     const updatedText = reminderEle.textContent;
     updateReminderInStorage(url, reminderToEdit, updatedText);
+
+    // remove disabled class from other reminders
+    exitEditMode()
 }
 
 function updateReminderInStorage(url, oldReminder, newReminder) {
@@ -187,6 +179,43 @@ function updateReminderInStorage(url, oldReminder, newReminder) {
             displayReminders(url); // refresh the list of reminders
         });
     });
+}
+
+// adds disabled class to all reminder(s), input, and button
+function enterEditMode() {
+    // target all the reminders not currently being editted to apply disabled class
+    const remindersList = document.querySelectorAll('.reminder-item')
+    remindersList.forEach(reminder => {
+        if(!reminder.classList.contains('editing')){
+            reminder.classList.add('disabled')
+        }
+    })
+    // apply disabled class to the input
+    const reminderInput = document.querySelector('.reminder-input-text');
+    reminderInput.classList.add('disabled')
+
+    // apply disabled class to the input
+    const saveButton = document.querySelector('.btn-submit-reminder');
+    saveButton.classList.add('disabled')
+
+}
+
+// removes all disabled reminders when editted reminder is saved or closed.
+function exitEditMode() {
+    // remove from reminder(s)
+    document.querySelectorAll('.reminder-item.disabled').forEach(reminder => {
+        reminder.classList.remove('disabled');
+    });
+    // remove from input
+    const reminderInput = document.querySelector('.reminder-input-text');
+    if (reminderInput && reminderInput.classList.contains('disabled')) {
+        reminderInput.classList.remove('disabled');
+    }
+    // remove from button
+    const submitButton = document.querySelector('.btn-submit-reminder');
+    if (submitButton && submitButton.classList.contains('disabled')) {
+        submitButton.classList.remove('disabled');
+    }
 }
 
 
