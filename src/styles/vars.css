@@ -1,19 +1,17 @@
 /* vars.css */
 :root {
     /* Color scheme */
-    --primary-color: #5C80BC; 
-    /* --secondary-color: #80D1F4; */ 
-    --accent-color: #379634; 
-    --background-color: #E8F0FE;
-    --disabled-color: #ECEFF1;
-    --warning-color:  #AD343E;
-    --btn-color: #5C80BC ; 
-
-    /* Typography color schemes */
-    --font-color: #0F1A20; 
+    --primary-color: #007BFF;       
+    --accent-color: #FF4136;        
+    --secondary-accent-color: #2ECC40; 
+    --background-color: #FFFFFF;   
+    --font-color: #333333;         
+    --disabled-color: #ECEFF1;      
+    --warning-color: #FF4136;       
+    --btn-color: #007BFF;           
 
     /* Actions */
-    --hover-color: #379634; 
+    --hover-color: #0056b3;  
     --hover-transition: 0.5s ease-in-out;
 
     /* Borders */

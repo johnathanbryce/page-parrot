@@ -27,6 +27,12 @@ main {
     font-size: clamp(1.2rem, 2vw, 1.4rem);
 }
 
+/* applied to all reminder(s), input, and button when in editting mode */
+.disabled {
+    pointer-events: none; 
+    opacity: 0.5; 
+}
+
 .reminders-list {
     display: flex;
     flex-direction: column;
@@ -34,12 +40,14 @@ main {
     width: 100%;
 }
 
-.reminders-list li {
+.reminder-item {
     display: flex;
     flex-direction: row;
-    /* justify-content: space-between; */
     align-items: center;
     font-weight: 800;
+    background: linear-gradient(to bottom, #ffffff 0%, var(--background-color) 100%); /* Using the variable for a subtle gradient */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Softer, more spread out shadow for subtle 3D effect */
+    border-radius: var(--border-radius); /* Use border radius from variable */
     position: relative;
 }
 
@@ -52,14 +60,12 @@ main {
     width: 1.6rem;
     height: 1.6rem;
     cursor: pointer;
-    transition: var(--hover-transition);
 }
 
 .icon-edit {
     right: 2rem;
     top: 1.5rem;
-    position: absolute;
-    /* margin-right: var(--content-gap); */
+    position: absolute;/
 }
 
 .icon-delete{
@@ -97,7 +103,7 @@ main {
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: 0.1rem solid var(--accent-color);
+    border-bottom: 0.1rem solid var(--primary-color);
     outline: none;
 }
 
