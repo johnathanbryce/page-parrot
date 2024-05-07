@@ -7,40 +7,66 @@ This script is  responsible for:
 /*
 // TODO:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
-    -- edit existing reminders
-    -- add a time stamp for when these were last left
 */
 
-// ensures dom loaded before fetching url and displaying reminders 
 document.addEventListener('DOMContentLoaded', function() {
+    // ensures dom loaded before fetching url and displaying reminders 
     getCurrentUrl().then(displayReminders);
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    const input = document.getElementById('reminder-text');
-    input.addEventListener("focus", function() {
+    // handles showing and hiding of the warning label
+    const warningLabel = document.getElementById('reminder-text');
+    warningLabel.addEventListener("focus", function() {
         this.nextElementSibling.style.visibility = 'visible';  // show warning label on focus
     });
-
-    input.addEventListener("blur", function() {
+    warningLabel.addEventListener("blur", function() {
         if (this.value === "") {
             this.nextElementSibling.style.visibility = 'hidden';  // hide warning label if input is empty
         }
     });
 });
 
+// displays the error message if reminder submit is invalid 
+function handleErrorMessage(isValid, errorMessage = ''){
+    const submitErrorMessage = document.getElementById('reminder-length-error-message');
+    const textInput = document.getElementById('reminder-text'); 
+
+    if (isValid) {
+        textInput.classList.remove('input-error');
+        submitErrorMessage.textContent = ''; 
+        submitErrorMessage.style.display = 'none'; 
+    } else {
+        textInput.classList.add('input-error');
+        submitErrorMessage.textContent = errorMessage; 
+        submitErrorMessage.style.display = 'block'; 
+        textInput.focus();
+    }
+}
 
 const submitForm = document.getElementById('reminder-form');
 submitForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const textInput = document.getElementById('reminder-text');
-    const reminder = textInput.value;
-    textInput.value = '';  // Clear input after getting value
-    // call the async function to get the url and then execute addReminder
-    getCurrentUrl().then((url) => {
+    const reminder = textInput.value.trim(); 
+
+    // check the length of the reminder
+    if (reminder.length > 30 || reminder.length < 3) {
+        handleErrorMessage(false, 'Reminders must be between 3 - 30 characters in length.');
+        return; 
+    } else {
+        handleErrorMessage(true)
+        getCurrentUrl().then((url) => {
         addReminder(url, reminder);
-    });
+        });
+
+        // clear input after getting value
+        textInput.value = '';
+
+        const warningLabel = document.getElementById('label-warning');
+        if (warningLabel) {
+            warningLabel.style.visibility = 'hidden';
+        }
+    }
 });
+
 
 // access the users active url 
 async function getCurrentUrl() {
@@ -57,36 +83,53 @@ async function getCurrentUrl() {
     }
 }
 
+// date as month - day -year
+function getFormattedDate() {
+    const date = new Date();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear().toString().slice(-2);
+
+    // Format the date as MM/DD/YYYY
+    return `${month}/${day}/${year}`;
+}
+
 // displays reminders to the DOM
 function displayReminders(url) {
     chrome.storage.sync.get(url, function(result) {
         const reminders = result[url] || [];
         const remindersListContainer = document.querySelector(".reminders-list");
         remindersListContainer.innerHTML = ''; // clear previous reminders
-        // display the reminder(s) 
-        reminders.forEach(reminder => {
+
+        // display the reminder(s) (remember, reminder is an obj with text and date keys)
+        reminders.forEach(reminderObj => {
             const reminderElement = document.createElement("li");
             reminderElement.className = "reminder-item"
             // set the id of the reminder as its text value
-            reminderElement.dataset.id = reminder; 
+            reminderElement.dataset.id = reminderObj.text; 
 
             // create text node for the reminder text to avoid overriding the innerHTML
-            const reminderText = document.createTextNode(reminder);
+            const reminderText = document.createTextNode(reminderObj.text);
             reminderElement.appendChild(reminderText);
+
+            // date stamp of reminder
+            const dateStampContainer = createDateStamp(reminderObj.date);
+            reminderElement.appendChild(dateStampContainer);
 
             // edit an existing reminder
             const editIcon = document.createElement('img');
             editIcon.src = '../images/edit-icon.svg'; 
             editIcon.alt='Edit reminder'
             editIcon.className = 'icon-edit';
-            editIcon.onclick = () => editReminder(url, reminder);
+            editIcon.onclick = () => editReminder(url, reminderObj.text);
             reminderElement.appendChild(editIcon);
             // add delete icon to reminder
             const deleteIcon = document.createElement('img');
             deleteIcon.src = '../images/delete-icon.svg'; 
             deleteIcon.alt= 'Delete reminder'
             deleteIcon.className = 'icon-delete';
-            deleteIcon.onclick = () => deleteReminder(url, reminder);
+            deleteIcon.onclick = () => deleteReminder(url, reminderObj.text);
             reminderElement.appendChild(deleteIcon);
 
             remindersListContainer.appendChild(reminderElement);
@@ -94,89 +137,146 @@ function displayReminders(url) {
     });
 }
 
+function createDateStamp(dateString) {
+    const dateStampContainer = document.createElement("div");
+    dateStampContainer.className = "date-stamp";
+
+    if (dateString) {
+        const monthSpan = document.createElement("span");
+        monthSpan.className = "month";
+        monthSpan.textContent = dateString.split('/')[0]; 
+        const dayYearSpan = document.createElement("span");
+        dayYearSpan.className = "day-year";
+        dayYearSpan.textContent = dateString.split('/')[1] + '/' + dateString.split('/')[2]; 
+
+        dateStampContainer.appendChild(monthSpan);
+        dateStampContainer.appendChild(dayYearSpan);
+    } else {
+        dateStampContainer.textContent = "Date missing"; // handle cases where date is missing
+    }
+
+    return dateStampContainer;
+}
+
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
-function addReminder(url, reminder) {
-    // TODO: check if the reminder already exists on the list and do not allow
-    // the user to add it if it already exists
+function addReminder(url, reminderText) {
     chrome.storage.sync.get(url, function(result) {
         let reminders = result[url] || [];
+        // ensure we are not storing a reminder that already exists
+        if (reminders.some(r => r.text === reminderText)) {
+            handleErrorMessage(false, "This reminder already exists!");
+            return;
+        }
+
+        const reminder = {
+            text: reminderText,
+            date: getFormattedDate()  
+        };
+
         reminders.push(reminder);
         chrome.storage.sync.set({ [url]: reminders }, function() {
-            console.log("Reminders updated for:", url);
-            displayReminders(url); // Refresh the list of reminders
+            displayReminders(url); // refresh the list of reminders
         });
     });
 }
 
+// resizes the document.body after deleting a reminder
+function forceHeightResize(element){
+    let disp = element.style.display;
+    element.style.display = 'none';
+    let trick = element.offsetHeight; // no need to use it, just access
+    element.style.display = disp;
+}
+
 // delete a reminder
 function deleteReminder(url, reminderToDelete) {
+    console.log(reminderToDelete)
     exitEditMode()
     // get the reminders to remove the targetted reminder
     chrome.storage.sync.get(url, function(result) {
         // get all reminders for the url as an array
        let reminders = result[url]
         // filter out the targetted reminder from this list
-       let filteredReminders = reminders.filter(rem => rem !== reminderToDelete)
+       let filteredReminders = reminders.filter(rem => rem.text !== reminderToDelete)
         // update the storage with the new filtered array
         chrome.storage.sync.set({ [url]: filteredReminders }, function() {
             displayReminders(url); // refresh the list of reminders
         });
     });
+
+    forceHeightResize(document.body);
 }
 
-// TODO:
-// need to disable all other reminders and set the focus on the editted reminder
-// i.e need to focus the remidner being editted and the other inputs CANNOT
-// be deleted or editted or functionality gets messed up
 function editReminder(url, reminderToEdit) {
-    // get the reminder ele and make it edittable
-    const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
-    reminderEle.contentEditable = 'true';
-    reminderEle.classList.add('editing') // this identifies the reminder currently being editted
+    if(reminderToEdit){
+        // get the reminder ele and make it edittable
+        const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
+        reminderEle.contentEditable = 'true';
+        reminderEle.classList.add('editing') // this identifies the reminder currently being editted
 
-    enterEditMode();
+        enterEditMode();
 
-    // replace edit icon with save icon
-    const editIcon = reminderEle.querySelector('.icon-edit');
-    editIcon.src = '../images/save-icon.svg';
-    editIcon.alt = 'Save reminder';
-    editIcon.onclick = () => saveReminder(url, reminderToEdit);
+        // replace edit icon with save icon
+        const editIcon = reminderEle.querySelector('.icon-edit');
+        editIcon.src = '../images/save-icon.svg';
+        editIcon.alt = 'Save reminder';
+        editIcon.onclick = () => saveReminder(url, reminderToEdit);
+    }
 }
 
-function saveReminder(url, reminderToEdit) {
-    // get the reminder ele and make it unedittable
-    const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
-    reminderEle.contentEditable = 'false';
+function saveReminder(url, reminderToSave) {
+    console.log(reminderToSave)
+    if (reminderToSave) {
+        const reminderEle = document.querySelector(`li[data-id="${reminderToSave}"]`);
+        const textNode = reminderEle.firstChild; // get the first child to only update the text in the li
+        const updatedText = textNode.textContent.trim();
 
-    // show delete icon and enable "Save Reminder" button
-    const deleteIcon = reminderEle.querySelector('.icon-delete');
-    deleteIcon.style.visibility = 'visible';
+        // ensure that updated reminder is > 3
+        if (updatedText.length < 3) {
+            reminderEle.classList.add('input-error');
+            reminderEle.setAttribute('data-error-message', 'Reminders must be more than 2 characters long.');
+            // keep the reminder in the editable state and the save icon visible
+            reminderEle.contentEditable = 'true'; 
+            const saveIcon = reminderEle.querySelector('.icon-edit');
+            if (saveIcon) {
+                saveIcon.src = '../images/save-icon.svg';
+                saveIcon.alt = 'Save reminder';
+                saveIcon.onclick = () => saveReminder(url, reminderToSave); 
+            }
+        } else {
+            // save and revert UI changes 
+            reminderEle.classList.remove('input-error');
+            reminderEle.removeAttribute('data-error-message');
+            reminderEle.contentEditable = 'false';
 
-    const submitBtn = document.querySelector('.btn-submit-reminder');
-    submitBtn.disabled = false;
-    submitBtn.classList.remove("btn-submit-reminder-disabled");
+            // only update the text content, not the entire <li> 
+            textNode.textContent = updatedText;
 
-    // replace save icon with edit icon
-    const saveIcon = reminderEle.querySelector('.icon-edit');
-    saveIcon.src = '../images/edit-icon.svg';
-    saveIcon.alt = 'Edit reminder';
-    saveIcon.onclick = () => editReminder(url, reminderToEdit);
+            const editIcon = reminderEle.querySelector('.icon-edit');
+            if (editIcon) {
+                editIcon.src = '../images/edit-icon.svg';
+                editIcon.alt = 'Edit reminder';
+                editIcon.onclick = () => editReminder(url, reminderToSave);
+            }
 
-    // Save the updated reminder text
-    const updatedText = reminderEle.textContent;
-    updateReminderInStorage(url, reminderToEdit, updatedText);
-
-    // remove disabled class from other reminders
-    exitEditMode()
+            updateReminderInStorage(url, reminderToSave, updatedText);
+            exitEditMode();
+        }
+    }
 }
 
-function updateReminderInStorage(url, oldReminder, newReminder) {
+
+function updateReminderInStorage(url, oldReminder, updatedReminder) {
     chrome.storage.sync.get(url, function(result) {
         let reminders = result[url];
-        let reminderIndex = reminders.indexOf(oldReminder);
-        reminders[reminderIndex] = newReminder; // update with new reminder text
+        let reminder = reminders.find(rem => rem.text === oldReminder);
+        console.log('in update', reminder)
+        if (reminder) {
+            reminder.text = updatedReminder; // updated reminder
+            reminder.date = getFormattedDate(); // updated date
+        }
         chrome.storage.sync.set({ [url]: reminders }, function() {
-            displayReminders(url); // refresh the list of reminders
+            displayReminders(url);
         });
     });
 }
@@ -197,7 +297,6 @@ function enterEditMode() {
     // apply disabled class to the input
     const saveButton = document.querySelector('.btn-submit-reminder');
     saveButton.classList.add('disabled')
-
 }
 
 // removes all disabled reminders when editted reminder is saved or closed.

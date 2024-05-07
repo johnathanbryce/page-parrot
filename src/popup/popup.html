@@ -15,6 +15,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     </head>
     <body>
+        <img 
+            class="header-logo"
+            src="../images/page-parrot-transparent.png"
+            alt="Page Parrot's logo. A colourful parrot head using the shape of Google Chrome's icon on the inside."
+        />
         <header class="header">
             <h1 class="header-text"> Page Parrot </h1>
         </header>
@@ -32,6 +37,7 @@
                     required
                 >
                 <label for="reminder-text" class="label-warning">Do not input any confidential information!</label>
+                <p id="reminder-length-error-message" class="reminder-length-error-message"></p>
                 <button type="submit" class="btn-submit-reminder">Save Reminder</button>
             </form>
         </main> 
