@@ -1,6 +1,12 @@
 // Listens to URL/Tab changes and continuously checks for existing reminders to notify popup.js
 // remember: background.js does not have directly access to the DOM
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.action === "updateBadge") {
+        checkActiveTab(); // Refresh the badge count based on the active tab's reminders
+    }
+});
+
 // access the users active url 
 async function getCurrentUrl() {
     try {
@@ -16,6 +22,7 @@ async function getCurrentUrl() {
     }
 }
 
+// TODO: refresh badge when a reminder is deleted
 // check the active tabs url to notify user of any reminder(s)
 async function checkActiveTab() {
     try {
@@ -37,7 +44,6 @@ async function checkActiveTab() {
                     chrome.action.setBadgeText({text: ''});
                 }
             });
-
         }
     } catch (error) {
         console.error('Failed to fetch or process the URL:', error);
