@@ -8,6 +8,8 @@ This script is responsible for:
 /*
 // TODO:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
+// TODO: refresh badge when a reminder is deleted
+
 */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -160,6 +162,13 @@ function createDateStamp(dateString) {
     return dateStampContainer;
 }
 
+
+// Function to send message to background.js
+function sendMessageToUpdateBadge() {
+    chrome.runtime.sendMessage({action: "updateBadge"});
+}
+
+
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
 function addReminder(url, reminderText) {
     chrome.storage.sync.get(url, function(result) {
@@ -178,6 +187,7 @@ function addReminder(url, reminderText) {
         reminders.push(reminder);
         chrome.storage.sync.set({ [url]: reminders }, function() {
             displayReminders(url); // refresh the list of reminders
+            sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
 }
@@ -203,6 +213,7 @@ function deleteReminder(url, reminderToDelete) {
         // update the storage with the new filtered array
         chrome.storage.sync.set({ [url]: filteredReminders }, function() {
             displayReminders(url); // refresh the list of reminders
+            sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
 
