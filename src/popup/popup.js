@@ -1,5 +1,6 @@
+
 /* 
-This script is  responsible for:
+This script is responsible for:
    - Fetching and displaying existing reminders when the popup is opened
    - Adding/deleting reminders to the current active URL and updating the display immediately
 */
@@ -8,6 +9,8 @@ This script is  responsible for:
 // TODO:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
 */
+
+console.log("Module loaded");
 
 document.addEventListener('DOMContentLoaded', function() {
     // ensures dom loaded before fetching url and displaying reminders 
@@ -68,6 +71,7 @@ submitForm.addEventListener('submit', (e) => {
 });
 
 
+
 // access the users active url 
 async function getCurrentUrl() {
     try {
@@ -83,7 +87,7 @@ async function getCurrentUrl() {
     }
 }
 
-// date as month - day -year
+// date as month - day - year
 function getFormattedDate() {
     const date = new Date();
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -297,6 +301,10 @@ function enterEditMode() {
     // apply disabled class to the input
     const saveButton = document.querySelector('.btn-submit-reminder');
     saveButton.classList.add('disabled')
+
+    // hide date stamp
+    const dateStamp = document.querySelector('.date-stamp')
+    dateStamp.style.visibility = 'hidden';
 }
 
 // removes all disabled reminders when editted reminder is saved or closed.
@@ -315,6 +323,10 @@ function exitEditMode() {
     if (submitButton && submitButton.classList.contains('disabled')) {
         submitButton.classList.remove('disabled');
     }
+
+    // unhide date stamp
+    const dateStamp = document.querySelector('.date-stamp')
+    dateStamp.style.visibility = 'visible';
 }
 
 
