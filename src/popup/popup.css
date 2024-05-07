@@ -15,7 +15,7 @@ main {
 .header-logo {
     width: 4.5rem;
     object-fit: cover;
-    transform: scaleX(-1) rotate(15deg);  
+    transform: rotate(-10deg);  
     right: 0.5rem;
     top: 0.5rem;
     position: absolute;

@@ -10,8 +10,6 @@ This script is responsible for:
     - notifications -- look into "Chrome's notification system" to alert users when they revisit a page with an active reminder
 */
 
-console.log("Module loaded");
-
 document.addEventListener('DOMContentLoaded', function() {
     // ensures dom loaded before fetching url and displaying reminders 
     getCurrentUrl().then(displayReminders);

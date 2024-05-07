@@ -2,13 +2,14 @@
     "manifest_version": 3,
     "name": "PageParrot",
     "version": "1.0",
-    "description": "Leave reminder's to yourself when you re-visit a web page.",
+    "description": "Allows you to set, edit, and delete reminders for specific web pages. Stay organized with a visual badge notification for active reminders.",
     "permissions": [
       "activeTab",
       "storage",
       "tabs",
       "notifications",
-      "webNavigation"
+      "webNavigation",
+      "alarms"
     ],
     "action": {
       "default_icon": "src/images/page-parrot.png", 
@@ -22,6 +23,12 @@
       "32": "src/images/icon32.png",
       "48": "src/images/icon48.png",
       "128": "src/images/icon128.png"
-    }
+    },
+    "web_accessible_resources": [
+      {
+        "resources": ["src/images/*.png", "src/images/*.svg"],
+          "matches": ["<all_urls>"]
+      }
+  ]
 }
   
