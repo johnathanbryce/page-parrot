@@ -1,0 +1,31 @@
+.btn-submit-reminder{
+    width: 100%;
+    padding: 1rem;
+    font-size: clamp(1.6rem, 2vw, 2rem);
+    font-weight: bold;
+    color: white;
+    background-color: var(--btn-color);
+    border: 0.1rem solid white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color var(--hover-transition);
+}
+
+
+.btn-submit-reminder:hover {
+    border: 0.1rem solid var(--background-color);
+    background-color: var(--hover-color);
+}
+
+.btn-submit-reminder-disabled {
+    width: 100%;
+    padding: 1rem;
+    font-size: clamp(1.6rem, 2vw, 2rem);
+    font-weight: bold;
+    color: white;
+    background-color: var(--btn-color);
+    border: 0.1rem solid white;
+    border-radius: var(--border-radius);
+    cursor: not-allowed;
+    background-color: var(--disabled-color);
+}
