@@ -51,8 +51,8 @@ submitForm.addEventListener('submit', (e) => {
     const reminder = textInput.value.trim(); 
 
     // check the length of the reminder
-    if (reminder.length > 30 || reminder.length < 3) {
-        handleErrorMessage(false, 'Reminders must be between 3 - 30 characters in length.');
+    if (reminder.length > 250 || reminder.length < 3) {
+        handleErrorMessage(false, 'Reminders must be between 3 - 250 characters in length');
         return; 
     } else {
         handleErrorMessage(true)
@@ -192,13 +192,7 @@ function addReminder(url, reminderText) {
     });
 }
 
-// resizes the document.body after deleting a reminder
-function forceHeightResize(element){
-    let disp = element.style.display;
-    element.style.display = 'none';
-    let trick = element.offsetHeight; // no need to use it, just access
-    element.style.display = disp;
-}
+
 
 // delete a reminder
 function deleteReminder(url, reminderToDelete) {
@@ -216,8 +210,6 @@ function deleteReminder(url, reminderToDelete) {
             sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
-
-    forceHeightResize(document.body);
 }
 
 function editReminder(url, reminderToEdit) {
@@ -244,10 +236,10 @@ function saveReminder(url, reminderToSave) {
         const textNode = reminderEle.firstChild; // get the first child to only update the text in the li
         const updatedText = textNode.textContent.trim();
 
-        // ensure that updated reminder is > 3
-        if (updatedText.length < 3) {
+        // ensure that updated reminder is > 3 and < 250 chars
+        if (updatedText.length > 250 || updatedText.length < 3) {
             reminderEle.classList.add('input-error');
-            reminderEle.setAttribute('data-error-message', 'Reminders must be more than 2 characters long.');
+            reminderEle.setAttribute('data-error-message', 'Reminders must be between 3 - 250 characters in length.');
             // keep the reminder in the editable state and the save icon visible
             reminderEle.contentEditable = 'true'; 
             const saveIcon = reminderEle.querySelector('.icon-edit');

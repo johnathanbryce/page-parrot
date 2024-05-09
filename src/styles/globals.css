@@ -1,10 +1,13 @@
 @import './vars.css';
 
+* {
+    box-sizing: border-box;
+}
+
 html {
   font-size: 62.5%; /* 100% would be 16 px so now, 1 rem = 10px */
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: none;
 }
@@ -19,7 +22,7 @@ body {
   overflow-y: hidden;
   background-color: var(--background-color);
   font-family: 'Nunito', sans-serif;
-  width: 40rem;
+  width: 42.5rem;
 }
 
 /* Typography */
