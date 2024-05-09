@@ -10,21 +10,20 @@
 }
 
 .icon-delete{
-    right: 0rem;
-    top: -0.3rem;
+    right: 0.25rem;
+    top: 0.25rem;
     position: absolute;
-    z-index: 10;
+    z-index: 10; 
 }
 
 .icon-delete:hover{
-    width: 1.8rem;
-    height: 1.8rem;
-   
+    color: var(--warning-color);
+  
 }
 
-.icon-edit {
-    right: 2.5rem;
-    top: 1.5rem;
+.icon-edit, .icon-save {
+    right: 1.4rem;
+    top: 0.75rem;
     position: absolute; 
 }
 
@@ -32,10 +31,8 @@
     width: 1.8rem;
     height: 1.8rem;
     cursor: pointer;
-    right: 2rem;
-    top: 1.5rem;
-    position: absolute;
-    animation: pulse-animation 2s infinite;
+    animation: pulse-animation 4s infinite;
+    color: var(--secondary-accent-color);
 }
 
 @keyframes pulse-animation {

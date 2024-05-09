@@ -1,7 +1,8 @@
+/* General Styles for Lists and Items */
 .reminders-list {
     display: flex;
     flex-direction: column;
-    gap: var(--content-gap); 
+    gap: 2.5rem;
     padding: 0; 
     box-sizing: border-box; 
 }
@@ -10,12 +11,12 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--content-gap);
     justify-content: space-between;
+    gap: var(--content-gap);
     font-weight: 800;
     background: linear-gradient(to bottom, #ffffff 0%, var(--background-color) 100%);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); 
-    border-radius: var(--border-radius); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: var(--border-radius);
     position: relative;
     outline: none;
     overflow-x: hidden;
@@ -23,8 +24,7 @@
     word-break: break-all;
 }
 
-
-
+/* Date Stamp Styles */
 .date-stamp {
     display: flex;
     flex-direction: column;
@@ -35,15 +35,85 @@
     pointer-events: none;
 }
 
-.month {
+.month,
+.day-year {
     width: 4rem;
-    font-size: 1rem;
     font-weight: bold;
     pointer-events: none;
 }
 
-.day-year {
-    width: 4rem;
-    font-size: 0.9rem;
-    pointer-events: none;
+.month {
+    font-size: 1rem;
 }
+
+.day-year {
+    font-size: 0.9rem;
+}
+
+/* Form Related Styles */
+.reminder-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-gap);
+    position: relative;
+    z-index: 1; 
+}
+
+.reminder-input-text {
+    width: 100%;
+    resize: none;
+    padding: 1rem;
+    padding-top: 2rem;  
+    outline: none;
+    border: none;  
+    background-color: white;
+    border-radius: var(--border-radius);
+}
+
+.reminder-input-text:focus {
+    border-bottom: 0.1rem solid var(--primary-color);
+    outline: none;
+}
+
+.label-warning {
+    position: absolute;
+    top: 0; 
+    left: 1rem; 
+    font-size: 1rem;
+    visibility: hidden;  /* hide by default */
+    transition: visibility 0.1s, color 0.3s;
+}
+
+.reminder-input-text:focus + .label-warning {
+    visibility: visible;
+    color: var(--warning-color); 
+}
+
+/* Error Display Styles */
+.input-error {
+    z-index: 2;
+    animation: gentle-shake 0.8s ease-in-out;
+    border: 0.1rem solid var(--warning-color); 
+}
+
+@keyframes gentle-shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 80% { transform: translateX(-5px); }
+    40%, 60% { transform: translateX(5px); }
+}
+
+.input-error::after {
+    content: attr(data-error-message); /* display error message from data attribute */
+    color: var(--warning-color);
+    position: absolute;
+    background: var(--font-color);
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    top: 3rem; 
+    left: 0; 
+    white-space: nowrap; 
+    display: block;
+    z-index: 3;
+    font-size: 1.45rem;
+}
+
