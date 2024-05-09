@@ -3,7 +3,7 @@
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action === "updateBadge") {
-        checkActiveTab(); // Refresh the badge count based on the active tab's reminders
+        checkActiveTab(); // refresh the badge count based on the active tab's reminders
     }
 });
 
@@ -22,15 +22,12 @@ async function getCurrentUrl() {
     }
 }
 
-// TODO: refresh badge when a reminder is deleted
 // check the active tabs url to notify user of any reminder(s)
 async function checkActiveTab() {
     try {
         const baseUrl = await getCurrentUrl(); 
         if (baseUrl) {
-            console.log('baseUrl', baseUrl)
             chrome.storage.sync.get(baseUrl, function(data) {
-                
                 if (data[baseUrl] && data[baseUrl].length > 0) {
                     console.log(data[baseUrl] && data[baseUrl].length > 0)
                     // set badge text to the number of reminders
@@ -39,6 +36,15 @@ async function checkActiveTab() {
                     });
                     chrome.action.setBadgeBackgroundColor({color: '#007BFF'}); 
                     chrome.action.setBadgeTextColor({color: '#FFFFFF'}); 
+
+                    // Trigger a notification
+                    chrome.notifications.create({
+                        type: "basic",
+                        iconUrl: "../images/bell-notification.png",
+                        title: "Reminder Alert",
+                        message: "You have reminders on this page!",
+                        priority: 2
+                    });
                 } else {
                     // clear the badge if there are no reminders
                     chrome.action.setBadgeText({text: ''});
