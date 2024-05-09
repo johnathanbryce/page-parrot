@@ -91,7 +91,6 @@
 
 /* Error Display Styles */
 .input-error {
-    z-index: 2;
     animation: gentle-shake 0.8s ease-in-out;
     border: 0.1rem solid var(--warning-color); 
 }
@@ -102,18 +101,13 @@
     40%, 60% { transform: translateX(5px); }
 }
 
-.input-error::after {
-    content: attr(data-error-message); /* display error message from data attribute */
+.error-message {
     color: var(--warning-color);
-    position: absolute;
-    background: var(--font-color);
-    padding: 0.5rem;
+    background-color: var(--font-color);
+    padding: 1rem;
     border-radius: var(--border-radius);
-    top: 3rem; 
-    left: 0; 
-    white-space: nowrap; 
-    display: block;
-    z-index: 3;
-    font-size: 1.45rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 1.25rem;
+    font-weight: 600;
 }
-
