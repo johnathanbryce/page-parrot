@@ -9,8 +9,21 @@
     cursor: pointer;
 }
 
+.icon-delete{
+    right: 0rem;
+    top: -0.3rem;
+    position: absolute;
+    z-index: 10;
+}
+
+.icon-delete:hover{
+    width: 1.8rem;
+    height: 1.8rem;
+   
+}
+
 .icon-edit {
-    right: 2rem;
+    right: 2.5rem;
     top: 1.5rem;
     position: absolute; 
 }
@@ -38,16 +51,4 @@
         transform: scale(1);
         opacity: 1;
     }
-}
-
-.icon-delete{
-    right: -0.65rem;
-    top: -0.5rem;
-    position: absolute;
-}
-
-.icon-delete:hover{
-    width: 1.8rem;
-    height: 1.8rem;
-    right: -0.75rem;
 }
