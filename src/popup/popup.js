@@ -240,12 +240,25 @@ function saveReminder(url, reminderToSave) {
         const textNode = reminderEle.firstChild; // get the first child to only update the text in the li
         const updatedText = textNode.textContent.trim();
 
+        // remove any existing error message
+        const existingError = document.querySelector(`error-message`);
+        if (existingError) {
+            existingError.remove();
+        }
+
+        console.log(updatedText.length)
         // ensure that updated reminder is > 3 and < 250 chars
         if (updatedText.length > 250 || updatedText.length < 3) {
+            
+            // create and insert error message element
+            const errorMessage = document.createElement('div');
+            errorMessage.id = `error-message`;
+            errorMessage.textContent = 'Reminders must be between 3 - 250 characters.';
+            errorMessage.classList.add('error-message');
+            reminderEle.parentNode.insertBefore(errorMessage, reminderEle);
+            // add input-error to the li itself (shake and)
             reminderEle.classList.add('input-error');
-            reminderEle.setAttribute('data-error-message', 'Reminders must be between 3 - 250 characters.');
-            // keep the reminder in the editable state and the save icon visible
-            reminderEle.contentEditable = 'true'; 
+            reminderEle.contentEditable = 'true';
             const saveIcon = reminderEle.querySelector('.icon-edit');
             if (saveIcon) {
                 saveIcon.innerHTML = `
