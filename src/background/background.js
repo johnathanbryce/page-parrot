@@ -37,7 +37,7 @@ async function checkActiveTab() {
                     chrome.action.setBadgeBackgroundColor({color: '#007BFF'}); 
                     chrome.action.setBadgeTextColor({color: '#FFFFFF'}); 
 
-                    // Trigger a notification
+                    // trigger a notification
                     chrome.notifications.create({
                         type: "basic",
                         iconUrl: "../images/bell-notification.png",

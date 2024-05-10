@@ -352,8 +352,21 @@ function exitEditMode() {
     // unhide date stamp
     const dateStamp = document.querySelector('.date-stamp')
     dateStamp.style.visibility = 'visible';
-}
+} 
 
+// remove all reminders for a website
+function removeAllRemindersForUrl(baseUrl) {
+    chrome.storage.sync.get(baseUrl, function(result) {
+        if (result[baseUrl]) {
+            chrome.storage.sync.remove(baseUrl, function() {
+                displayReminders(baseUrl); 
+                sendMessageToUpdateBadge(); 
+            });
+        } else {
+            console.log(`No reminders found for ${baseUrl} to remove.`);
+        }
+    });
+}
 
 
 
