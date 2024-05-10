@@ -8,8 +8,7 @@
       "storage",
       "tabs",
       "notifications",
-      "webNavigation",
-      "alarms"
+      "webNavigation"
     ],
     "action": {
       "default_icon": "src/images/page-parrot.png", 

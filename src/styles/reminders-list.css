@@ -2,6 +2,7 @@
 .reminders-list {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     gap: 2.5rem;
     padding: 0; 
     box-sizing: border-box; 
@@ -21,7 +22,6 @@
     outline: none;
     overflow-x: hidden;
     text-wrap: wrap;
-    word-break: break-all;
 }
 
 /* Date Stamp Styles */
