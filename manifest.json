@@ -1,14 +1,13 @@
 {
     "manifest_version": 3,
     "name": "PageParrot",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Allows you to set, edit, and delete reminders for specific web pages. Notifications alert you when revisiting sites.",
     "permissions": [
       "activeTab",
       "storage",
       "tabs",
-      "notifications",
-      "webNavigation"
+      "notifications"
     ],
     "action": {
       "default_icon": "src/images/page-parrot.png", 
