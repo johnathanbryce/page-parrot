@@ -1,17 +1,19 @@
 // Listens to URL/Tab changes and continuously checks for existing reminders to notify popup.js
 // remember: background.js does not have directly access to the DOM
 
+let notificationShown = false;  // flag to track if the notification has been shown
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action === "updateBadge") {
-        checkActiveTab(); // refresh the badge count based on the active tab's reminders
+        updateBadge();  // update badge count
     }
 });
 
-// access the users active url 
+// access the user's active URL
 async function getCurrentUrl() {
     try {
-        let [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-        let url = tab.url
+        let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        let url = tab.url;
         // create a URL object -- this will help target the hostname: www.google.ca instead of www.google.ca/xyz
         const parsedUrl = new URL(url);
         // combine the protocol and hostname to get the base URL
@@ -22,32 +24,28 @@ async function getCurrentUrl() {
     }
 }
 
-// check the active tabs url to notify user of any reminder(s)
+// check the active tab's URL to notify the user of any reminders
 async function checkActiveTab() {
     try {
-        const baseUrl = await getCurrentUrl(); 
+        const baseUrl = await getCurrentUrl();
         if (baseUrl) {
             chrome.storage.sync.get(baseUrl, function(data) {
                 if (data[baseUrl] && data[baseUrl].length > 0) {
-                    console.log(data[baseUrl] && data[baseUrl].length > 0)
                     // set badge text to the number of reminders
-                    chrome.action.setBadgeText({
-                        text: data[baseUrl].length.toString()
-                    });
-                    chrome.action.setBadgeBackgroundColor({color: '#007BFF'}); 
-                    chrome.action.setBadgeTextColor({color: '#FFFFFF'}); 
-
-                    // trigger a notification
-                    chrome.notifications.create({
-                        type: "basic",
-                        iconUrl: "../images/bell-notification.png",
-                        title: "Reminder Alert",
-                        message: "You have reminders on this page!",
-                        priority: 2
-                    });
+                    updateBadge(data[baseUrl].length);
+                    if (!notificationShown) {
+                        // trigger a notification only if it hasn't been shown yet
+                        chrome.notifications.create({
+                            type: "basic",
+                            iconUrl: "../images/page-parrot-transparent.png",
+                            title: "Reminder Alert",
+                            message: `You have ${data[baseUrl].length.toString()} reminders for this page!`,
+                            priority: 2
+                        });
+                        notificationShown = true;  // set flag to true after showing notification
+                    }
                 } else {
-                    // clear the badge if there are no reminders
-                    chrome.action.setBadgeText({text: ''});
+                    updateBadge(0); // clear the badge if there are no reminders
                 }
             });
         }
@@ -56,15 +54,33 @@ async function checkActiveTab() {
     }
 }
 
+// function to update the badge count
+function updateBadge(count) {
+    if (count > 0) {
+        chrome.action.setBadgeText({
+            text: count.toString()
+        });
+        chrome.action.setBadgeBackgroundColor({ color: '#007BFF' });
+        chrome.action.setBadgeTextColor({ color: '#FFFFFF' });
+    } else {
+        // clear the badge if there are no reminders
+        chrome.action.setBadgeText({ text: '' });
+    }
+}
 
 // Event listeners that use the revised checkActiveTab function
-chrome.tabs.onActivated.addListener(() => checkActiveTab());
+chrome.tabs.onActivated.addListener(() => {
+    notificationShown = false;  // reset flag when the tab is activated
+    checkActiveTab();
+});
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.url) {
+        notificationShown = false;  // reset flag when the tab is updated with a new URL
         checkActiveTab();
     }
 });
 
-checkActiveTab()
+checkActiveTab();  // initial check on extension load
+
 
 
