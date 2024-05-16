@@ -165,6 +165,18 @@ function sendMessageToUpdateBadge() {
     chrome.runtime.sendMessage({action: "updateBadge"});
 }
 
+// Function to update the badge with the current number of reminders
+function updateBadge() {
+    const currentURL = window.location.href;
+    const parsedUrl = new URL(currentURL);
+    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+
+    chrome.storage.sync.get(baseUrl, function(data) {
+        const reminders = data[baseUrl] || [];
+        chrome.runtime.sendMessage({ action: "updateBadge", count: reminders.length });
+    });
+}
+
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
 function addReminder(url, reminderText) {
     chrome.storage.sync.get(url, function(result) {
@@ -182,6 +194,7 @@ function addReminder(url, reminderText) {
         reminders.push(reminder);
         chrome.storage.sync.set({ [url]: reminders }, function() {
             displayReminders(url); // refresh the list of reminders
+            updateBadge(); 
             sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
@@ -189,7 +202,6 @@ function addReminder(url, reminderText) {
 
 // delete a reminder
 function deleteReminder(url, reminderToDelete) {
-    console.log(reminderToDelete)
     exitEditMode()
     // get the reminders to remove the targetted reminder
     chrome.storage.sync.get(url, function(result) {
@@ -200,6 +212,7 @@ function deleteReminder(url, reminderToDelete) {
         // update the storage with the new filtered array
         chrome.storage.sync.set({ [url]: filteredReminders }, function() {
             displayReminders(url); // refresh the list of reminders
+            updateBadge(); 
             sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
@@ -246,7 +259,6 @@ function saveReminder(url, reminderToSave) {
             existingError.remove();
         }
 
-        console.log(updatedText.length)
         // ensure that updated reminder is > 3 and < 250 chars
         if (updatedText.length > 250 || updatedText.length < 3) {
             
@@ -367,6 +379,9 @@ function removeAllRemindersForUrl(baseUrl) {
         }
     });
 }
+
+// initialize on page load
+updateBadge(); 
 
 
 
