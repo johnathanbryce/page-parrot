@@ -5,7 +5,7 @@ let notificationShown = false;  // flag to track if the notification has been sh
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action === "updateBadge") {
-        updateBadge();  // update badge count
+        checkActiveTab();  // Re-check active tab to update the badge count
     }
 });
 
@@ -33,8 +33,7 @@ async function checkActiveTab() {
                 if (data[baseUrl] && data[baseUrl].length > 0) {
                     // set badge text to the number of reminders
                     updateBadge(data[baseUrl].length);
-                    if (!notificationShown) {
-                        // trigger a notification only if it hasn't been shown yet
+                    if (!notificationShown && data[baseUrl].length > 1) {
                         chrome.notifications.create({
                             type: "basic",
                             iconUrl: "../images/page-parrot-transparent.png",
@@ -54,25 +53,34 @@ async function checkActiveTab() {
     }
 }
 
+
 // function to update the badge count
 function updateBadge(count) {
     if (count > 0) {
         chrome.action.setBadgeText({
             text: count.toString()
         });
-        chrome.action.setBadgeBackgroundColor({ color: '#007BFF' });
         chrome.action.setBadgeTextColor({ color: '#FFFFFF' });
+        chrome.action.setBadgeBackgroundColor({ color: '#FF4136' });
     } else {
         // clear the badge if there are no reminders
         chrome.action.setBadgeText({ text: '' });
     }
 }
 
-// Event listeners that use the revised checkActiveTab function
+// triggers when the tab is activated
 chrome.tabs.onActivated.addListener(() => {
     notificationShown = false;  // reset flag when the tab is activated
     checkActiveTab();
 });
+
+// triggers on tab creation
+chrome.tabs.onCreated.addListener(() => {
+    notificationShown = false;  // reset flag when a new tab is created
+    checkActiveTab();
+});
+
+// triggers when the tab is updated
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.url) {
         notificationShown = false;  // reset flag when the tab is updated with a new URL
@@ -80,7 +88,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 });
 
+// triggers when the extension is installed or reloaded
+chrome.runtime.onInstalled.addListener(() => {
+    notificationShown = false;  // reset flag on installation or reload
+    chrome.storage.sync.set({ notificationShown: false });  // store the initial notification state
+    checkActiveTab();  // initial check on extension load
+});
+
+
 checkActiveTab();  // initial check on extension load
+
 
 
 
