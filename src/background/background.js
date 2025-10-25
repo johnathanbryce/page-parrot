@@ -33,10 +33,10 @@ async function checkActiveTab() {
                 if (data[baseUrl] && data[baseUrl].length > 0) {
                     // set badge text to the number of reminders
                     updateBadge(data[baseUrl].length);
-                    if (!notificationShown && data[baseUrl].length > 1) {
+                    if (!notificationShown && data[baseUrl].length > 0) {
                         chrome.notifications.create({
                             type: "basic",
-                            iconUrl: "../images/page-parrot-transparent.png",
+                            iconUrl: chrome.runtime.getURL("src/images/page-parrot-transparent.png"),
                             title: "Reminder Alert",
                             message: `You have ${data[baseUrl].length.toString()} reminders for this page!`,
                             priority: 2

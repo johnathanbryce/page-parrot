@@ -1,64 +1,98 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PageParrot</title>
-        <meta name="description" content="PageParrot is a Chrome extension that helps you set reminders for web pages you visit, ensuring you never forget important tasks related to specific websites.">
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../styles/reset.css">       
-        <link rel="stylesheet" href="../styles/vars.css">        
-        <link rel="stylesheet" href="../styles/globals.css">
-        <link rel="stylesheet" href="../styles/reminders-list.css">
-        <link rel="stylesheet" href="../styles/icons.css">
-        <link rel="stylesheet" href="../styles/buttons.css">
-        <link rel="stylesheet" href="popup.css">
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-    </head>
-    <body>
-        <img 
-            class="header-logo"
-            src="../images/page-parrot-transparent.png"
-            alt="Page Parrot's logo. A colourful parrot head using the shape of Google Chrome's icon on the inside."
-        />
-        <header class="header">
-            <h1 class="header-text"> Page Parrot </h1>
-        </header>
-        <main>
-            <p>Set a reminder for when you revisit this page next:</p> 
-            <ul class="reminders-list">
-                <!-- reminders added here -->
-            </ul>
-            <form id="reminder-form" class="reminder-form">
-                <input 
-                    type="text" 
-                    id="reminder-text"
-                    class="reminder-input-text"
-                    placeholder="Type your reminder here..." 
-                    required
-                >
-                <label for="reminder-text" class="label-warning">Do not input any confidential information!</label>
-                <p id="reminder-length-error-message" class="reminder-length-error-message"></p>
-                <button type="submit" class="btn-submit-reminder">Save Reminder</button>
-            </form>
-        </main>
-        <footer>
-            <p class="footer-link"> &copy;  
-                <a href="https://www.jbryce.dev/" target="_blank" class="website-link">
-                    john bryce - developer
-                </a> 
-            </p>
-            <div class="social-icons-container">
-                <a href="https://github.com/johnathanbryce" target="_blank" aria-label="Visit my GitHub profile">
-                    <img src="../images/github.svg" alt="Github's official icon." class="socials-icon">
-                </a>
-                <a href="https://www.linkedin.com/in/johnathanbryce/" target="_blank" aria-label="Visit my LinkedIn profile">
-                    <img src="../images/linkedin.svg" alt="LinkedIn's official icon" class="socials-icon">
-                </a>
-                
-            </div>
-        </footer>
-        <script src="popup.js" ></script> 
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PageParrot</title>
+    <meta
+      name="description"
+      content="PageParrot is a Chrome extension that helps you set reminders for web pages you visit, ensuring you never forget important tasks related to specific websites."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/reset.css" />
+    <link rel="stylesheet" href="../styles/vars.css" />
+    <link rel="stylesheet" href="../styles/globals.css" />
+    <link rel="stylesheet" href="../styles/reminders-list.css" />
+    <link rel="stylesheet" href="../styles/icons.css" />
+    <link rel="stylesheet" href="../styles/buttons.css" />
+    <link rel="stylesheet" href="popup.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <img
+      class="header-logo"
+      src="../images/page-parrot-transparent.png"
+      alt="Page Parrot's logo. A colourful parrot head using the shape of Google Chrome's icon on the inside."
+    />
+    <header class="header">
+      <h1 class="header-text">Page Parrot</h1>
+    </header>
+    <main>
+      <p>Set a reminder for when you revisit this page next:</p>
+      <ul class="reminders-list">
+        <!-- reminders added here -->
+      </ul>
+      <form id="reminder-form" class="reminder-form">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="reminder-text"
+            class="reminder-input-text"
+            placeholder="Type your reminder here..."
+            required
+            maxlength="250"
+          />
+          <label for="reminder-text" class="label-warning"
+            >Do not input any confidential information!</label
+          >
+          <span id="char-counter" class="char-counter">0/250</span>
+        </div>
+        <p
+          id="reminder-length-error-message"
+          class="reminder-length-error-message"
+        ></p>
+        <button type="submit" class="btn-submit-reminder">Save Reminder</button>
+      </form>
+    </main>
+    <footer>
+      <p class="footer-link">
+        &copy;
+        <a href="https://www.jbryce.dev/" target="_blank" class="website-link">
+          john bryce - developer
+        </a>
+      </p>
+      <div class="social-icons-container">
+        <a
+          href="https://github.com/johnathanbryce"
+          target="_blank"
+          aria-label="Visit my GitHub profile"
+        >
+          <img
+            src="../images/github.svg"
+            alt="Github's official icon."
+            class="socials-icon"
+          />
+        </a>
+        <a
+          href="https://www.linkedin.com/in/johnathanbryce/"
+          target="_blank"
+          aria-label="Visit my LinkedIn profile"
+        >
+          <img
+            src="../images/linkedin.svg"
+            alt="LinkedIn's official icon"
+            class="socials-icon"
+          />
+        </a>
+      </div>
+    </footer>
+    <script src="popup.js"></script>
+  </body>
 </html>
