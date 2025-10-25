@@ -144,17 +144,23 @@ function createDateStamp(dateString) {
     dateStampContainer.className = "date-stamp";
 
     if (dateString) {
-        const monthSpan = document.createElement("span");
-        monthSpan.className = "month";
-        monthSpan.textContent = dateString.split('/')[0]; 
-        const dayYearSpan = document.createElement("span");
-        dayYearSpan.className = "day-year";
-        dayYearSpan.textContent = dateString.split('/')[1] + '/' + dateString.split('/')[2]; 
+        const dateParts = dateString.split('/');
+        // Validate that we have all three parts (month/day/year)
+        if (dateParts.length === 3 && dateParts[0] && dateParts[1] && dateParts[2]) {
+            const monthSpan = document.createElement("span");
+            monthSpan.className = "month";
+            monthSpan.textContent = dateParts[0];
+            const dayYearSpan = document.createElement("span");
+            dayYearSpan.className = "day-year";
+            dayYearSpan.textContent = dateParts[1] + '/' + dateParts[2];
 
-        dateStampContainer.appendChild(monthSpan);
-        dateStampContainer.appendChild(dayYearSpan);
+            dateStampContainer.appendChild(monthSpan);
+            dateStampContainer.appendChild(dayYearSpan);
+        } else {
+            dateStampContainer.textContent = "Date missing";
+        }
     } else {
-        dateStampContainer.textContent = "Date missing"; 
+        dateStampContainer.textContent = "Date missing";
     }
 
     return dateStampContainer;
@@ -165,18 +171,6 @@ function sendMessageToUpdateBadge() {
     chrome.runtime.sendMessage({action: "updateBadge"});
 }
 
-// Function to update the badge with the current number of reminders
-function updateBadge() {
-    const currentURL = window.location.href;
-    const parsedUrl = new URL(currentURL);
-    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-
-    chrome.storage.sync.get(baseUrl, function(data) {
-        const reminders = data[baseUrl] || [];
-        chrome.runtime.sendMessage({ action: "updateBadge", count: reminders.length });
-    });
-}
-
 // adds a new reminder to chrome.storage.sync (displayed on DOM via displayReminders)
 function addReminder(url, reminderText) {
     chrome.storage.sync.get(url, function(result) {
@@ -184,6 +178,9 @@ function addReminder(url, reminderText) {
         // ensure we are not storing a reminder that already exists
         if (reminders.some(r => r.text === reminderText)) {
             handleErrorMessage(false, "This reminder already exists!");
+            // clear the input field
+            const textInput = document.getElementById('reminder-text');
+            if (textInput) textInput.value = '';
             return;
         }
         // reminder as an obj with the text and the date 
@@ -194,7 +191,6 @@ function addReminder(url, reminderText) {
         reminders.push(reminder);
         chrome.storage.sync.set({ [url]: reminders }, function() {
             displayReminders(url); // refresh the list of reminders
-            updateBadge(); 
             sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
@@ -212,7 +208,6 @@ function deleteReminder(url, reminderToDelete) {
         // update the storage with the new filtered array
         chrome.storage.sync.set({ [url]: filteredReminders }, function() {
             displayReminders(url); // refresh the list of reminders
-            updateBadge(); 
             sendMessageToUpdateBadge(); // tell background.js to update the badge
         });
     });
@@ -221,6 +216,12 @@ function deleteReminder(url, reminderToDelete) {
 function editReminder(url, reminderToEdit) {
     if (reminderToEdit) {
         const reminderEle = document.querySelector(`li[data-id="${reminderToEdit}"]`);
+
+        // Remove any existing keypress handler to prevent duplicates
+        if (reminderEle.keypressHandler) {
+            reminderEle.removeEventListener('keypress', reminderEle.keypressHandler);
+        }
+
         reminderEle.contentEditable = 'true';
         reminderEle.classList.add('editing'); // this identifies the reminder currently being edited
 
@@ -236,13 +237,16 @@ function editReminder(url, reminderToEdit) {
         iconContainer.className = 'icon-save'; // Update class if needed
         iconContainer.onclick = () => saveReminder(url, reminderToEdit);
 
-        // listen for Enter key to save reminder
-        reminderEle.addEventListener('keypress', function(event) {
+        // Create and store the keypress handler so we can remove it later
+        reminderEle.keypressHandler = function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault();  
-                saveReminder(url, reminderToEdit); 
+                event.preventDefault();
+                saveReminder(url, reminderToEdit);
             }
-        });
+        };
+
+        // listen for Enter key to save reminder
+        reminderEle.addEventListener('keypress', reminderEle.keypressHandler);
     }
 }
 
@@ -254,7 +258,7 @@ function saveReminder(url, reminderToSave) {
         const updatedText = textNode.textContent.trim();
 
         // remove any existing error message
-        const existingError = document.querySelector(`error-message`);
+        const existingError = document.querySelector(`.error-message`);
         if (existingError) {
             existingError.remove();
         }
@@ -282,12 +286,18 @@ function saveReminder(url, reminderToSave) {
                 saveIcon.onclick = () => saveReminder(url, reminderToSave); 
             }
         } else {
-            // save and revert UI changes 
+            // save and revert UI changes
             reminderEle.classList.remove('input-error');
             reminderEle.removeAttribute('data-error-message');
             reminderEle.contentEditable = 'false';
 
-            // only update the text content, not the entire <li> 
+            // Remove the keypress event listener
+            if (reminderEle.keypressHandler) {
+                reminderEle.removeEventListener('keypress', reminderEle.keypressHandler);
+                delete reminderEle.keypressHandler;
+            }
+
+            // only update the text content, not the entire <li>
             textNode.textContent = updatedText;
 
             const editIcon = reminderEle.querySelector('.icon-edit');
@@ -361,9 +371,22 @@ function exitEditMode() {
         submitButton.classList.remove('disabled');
     }
 
-    // unhide date stamp
-    const dateStamp = document.querySelector('.date-stamp')
-    dateStamp.style.visibility = 'visible';
+    // unhide date stamp for the reminder that was being edited
+    const editingReminder = document.querySelector('.reminder-item.editing');
+    if (editingReminder) {
+        const dateStamp = editingReminder.querySelector('.date-stamp');
+        if (dateStamp) {
+            dateStamp.style.visibility = 'visible';
+        }
+
+        // Remove any lingering keypress handler
+        if (editingReminder.keypressHandler) {
+            editingReminder.removeEventListener('keypress', editingReminder.keypressHandler);
+            delete editingReminder.keypressHandler;
+        }
+
+        editingReminder.classList.remove('editing');
+    }
 } 
 
 // remove all reminders for a website
@@ -380,8 +403,7 @@ function removeAllRemindersForUrl(baseUrl) {
     });
 }
 
-// initialize on page load
-updateBadge(); 
+// initialize on page load - badge will update when displayReminders is called 
 
 
 
