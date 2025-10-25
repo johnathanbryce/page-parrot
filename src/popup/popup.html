@@ -40,16 +40,20 @@
         <!-- reminders added here -->
       </ul>
       <form id="reminder-form" class="reminder-form">
-        <input
-          type="text"
-          id="reminder-text"
-          class="reminder-input-text"
-          placeholder="Type your reminder here..."
-          required
-        />
-        <label for="reminder-text" class="label-warning"
-          >Do not input any confidential information!</label
-        >
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="reminder-text"
+            class="reminder-input-text"
+            placeholder="Type your reminder here..."
+            required
+            maxlength="250"
+          />
+          <label for="reminder-text" class="label-warning"
+            >Do not input any confidential information!</label
+          >
+          <span id="char-counter" class="char-counter">0/250</span>
+        </div>
         <p
           id="reminder-length-error-message"
           class="reminder-length-error-message"
