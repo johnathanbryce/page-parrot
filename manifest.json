@@ -1,32 +1,26 @@
 {
-    "manifest_version": 3,
-    "name": "PageParrot",
-    "version": "1.3",
-    "description": "Allows you to set, edit, and delete reminders for specific web pages. Notifications alert you when revisiting sites.",
-    "permissions": [
-      "activeTab",
-      "storage",
-      "tabs",
-      "notifications"
-    ],
-    "action": {
-      "default_icon": "src/images/page-parrot.png", 
-      "default_popup": "src/popup/popup.html"
-    },
-    "background": {
-      "service_worker": "src/background/background.js"
-    },
-    "icons": {
-      "16": "src/images/icon16.png", 
-      "32": "src/images/icon32.png",
-      "48": "src/images/icon48.png",
-      "128": "src/images/icon128.png"
-    },
-    "web_accessible_resources": [
-      {
-        "resources": ["src/images/*.png", "src/images/*.svg"],
-          "matches": ["<all_urls>"]
-      }
+  "manifest_version": 3,
+  "name": "PageParrot",
+  "version": "1.4",
+  "description": "Allows you to set, edit, and delete reminders for specific web pages. Notifications alert you when revisiting sites.",
+  "permissions": ["activeTab", "storage", "tabs", "notifications"],
+  "action": {
+    "default_icon": "src/images/page-parrot.png",
+    "default_popup": "src/popup/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "icons": {
+    "16": "src/images/icon16.png",
+    "32": "src/images/icon32.png",
+    "48": "src/images/icon48.png",
+    "128": "src/images/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/images/*.png", "src/images/*.svg"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
-  
